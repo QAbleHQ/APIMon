@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test Generator</title>
+    <script src="https://unpkg.com/htmx.org@1.6.1"></script>
+    <style>
+        form {
+            width: 50%;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #000;
+            border-radius: 5px;
+        }
+        label {
+            display: block;
+            margin-top: 20px;
+        }
+        input[type="submit"] {
+            margin-top: 20px;
+            border-radius: 5px;
+            padding: 10px 20px;
+            background-color: blue;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #000080;
+        }
+        .response-container {
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+<h1>API Test Generator</h1>
+<form id="api-details-form" hx-post="/api" hx-vals='jsonData()' hx-trigger="submit" hx-swap="outerHTML">
+    <label for="endPoint">Endpoint:</label>
+    <input type="text" id="endPoint" name="endPoint">
+
+    <label for="methodType">Method Type:</label>
+    <select id="methodType" name="methodType">
+        <option value="GET">GET</option>
+        <option value="POST">POST</option>
+    </select>
+
+    <label for="header">Headers (JSON):</label>
+    <textarea id="header" name="header" rows="4" cols="50"></textarea>
+
+    <label for="formData">Form/Data (JSON):</label>
+    <textarea id="formData" name="formData" rows="4" cols="50"></textarea>
+
+    <label for="possibleValue">Possible Values (JSON):</label>
+    <textarea id="possibleValue" name="possibleValue" rows="4" cols="50"></textarea>
+
+    <input type="submit" value="Submit">
+</form>
+
+<div class="response-container" id="responseContainer" hx-swap="innerHTML">
+    <!-- Server response will be swapped in here -->
+</div>
+
+<script>
+        function jsonData() {
+            return {
+                endPoint: document.getElementById('endPoint').value,
+                methodType: document.getElementById('methodType').value,
+                header: document.getElementById('header').value,
+                formData: document.getElementById('formData').value,
+                possibleValue: document.getElementById('possibleValue').value
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+{
+  "request": {
+    "endPoint": "https://apitest.nevvon.com/login",
+    "methodType": "POST",
+    "header": {
+      "sec-ch-ua": "\"Chromium\";v=\"110\", \"Not A(Brand\";v=\"24\", \"Google Chrome\";v=\"110\"",
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      "Referer": "http://ngtest.nevvon.com/",
+      "sec-ch-ua-mobile": "?0",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform": "\"Windows\""
+    },
+    "data": {
+      "email": "String",
+      "password": "String",
+      "remember_me": "boolean"
+    }
+  },
+  "possibleValue": {
+    "data": {
+      "email": [
+        "apicoordinator@mailinator.com" , "" , "aa"
+      ],
+      "password": [
+        "QA_12345", ""
+      ],
+      "remember_me": [
+        true,
+        false
+      ]
+    }
+  }
+}
+

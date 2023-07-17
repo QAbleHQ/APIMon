@@ -1,0 +1,33 @@
+curl --location 'https://goldenfantasy11-api.staging-server.in/api-front/user/add_contest' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NDk0MGExNDc3YWRmNWE2NWRhMTRjOGMiLCJpYXQiOjE2ODgxMDkxNjl9.qoT8aIdjLPPfyrEOjvbVW85KPeGhyMt0hmNJP7tmdnA' \
+--form 'title="testing private contest 1"' \
+--form 'match_id="64883bcc42497f48b9bc7500"' \
+--form 'game_type="cricket"' \
+--form 'total_team="20"' \
+--form 'prize_pool="200"' \
+--form 'entry_fee="30"' \
+--form 'price="[{\"from\": 1,\"to\": 1,\"price\":100},{\"from\": 2,\"to\": 3,\"price\":50}]"' \
+--form 'friend_join_multi_team="true"'
+
+
+curl --location 'https://goldenfantasy11-api.staging-server.in/api-front/user/add_contest' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NDk0MGExNDc3YWRmNWE2NWRhMTRjOGMiLCJpYXQiOjE2ODgxMDkxNjl9.qoT8aIdjLPPfyrEOjvbVW85KPeGhyMt0hmNJP7tmdnA' \
+--form 'title="testing private contest 1"' \
+--form 'match_id="64883bcc42497f48b9bc7500"' \
+--form 'game_type="cricket"' \
+--form 'total_team="20"' \
+--form 'prize_pool="200"' \
+--form 'entry_fee="30"' \
+--form 'price="[{"from": 1,"to": 2,"price":150},{"from": 3,"to": 4,"price":70}]"' \
+--form 'friend_join_multi_team="true"'
+
+curl --location 'https://goldenfantasy11-api.staging-server.in/api-front/user/add_contest' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NDk0MGExNDc3YWRmNWE2NWRhMTRjOGMiLCJpYXQiOjE2ODgxMDkxNjl9.qoT8aIdjLPPfyrEOjvbVW85KPeGhyMt0hmNJP7tmdnA' \
+--form 'title="testing private contest 1"' \
+--form 'match_id="64883bcc42497f48b9bc7500"' \
+--form 'game_type="cricket"' \
+--form 'total_team="20"' \
+--form 'prize_pool="200"' \
+--form 'entry_fee="30"' \
+--form 'price="[{"from": 1,"to": 1,"price":150},{"from": 2,"to": 3,"price":50}]"' \
+--form 'friend_join_multi_team="true"'
