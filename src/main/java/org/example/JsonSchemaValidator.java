@@ -3,11 +3,24 @@ package org.example;
 
 import com.github.erosb.jsonsKema.*;
 
-public class JsonSchemeGenerator {
+public class JsonSchemaValidator {
+
+
+    public void validateSchema(){
+
+
+
+
+
+    }
     public static void main(String[] args) {
         // Load the schema from a JSON string
 
-        JsonValue schemaJson = new JsonParser("{\n" +
+
+
+
+
+    JsonValue schemaJson = new JsonParser("{\n" +
                 "    \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n" +
                 "    \"type\": \"object\",\n" +
                 "    \"properties\": {\n" +

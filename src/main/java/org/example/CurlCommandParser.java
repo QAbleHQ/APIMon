@@ -93,6 +93,7 @@ public class CurlCommandParser {
 
         finalResponse.put("response", responseString);
         finalResponse.put("statusCode", statusCode);
+
         return finalResponse;
     }
 

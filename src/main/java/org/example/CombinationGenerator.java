@@ -1,23 +1,17 @@
 package org.example;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import okhttp3.*;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
 public class CombinationGenerator {
-
-
-    private static ObjectMapper objectMapper = new ObjectMapper();
 
     public static String readJsonFile(String filePath) {
         String jsonStr = "";
@@ -31,7 +25,7 @@ public class CombinationGenerator {
     }
 
     public static void main(String[] args) {
-        String jsonString = readJsonFile("src/main/resources/requests/test.json");
+        String jsonString = readJsonFile("/Users/viralpatel/Downloads/APIMon/src/main/resources/requests/test.json");
         JSONObject jsonObject = new JSONObject(jsonString);
 
         JSONObject request = jsonObject.getJSONObject("request");
@@ -43,89 +37,93 @@ public class CombinationGenerator {
         JSONObject queryParameters = request.has("queryParameters") ? request.getJSONObject("queryParameters") : new JSONObject();
 
         List<Map<String, String>> combinations;
+        List<Map<String, String>> results;
 
-        Workbook workbook = new XSSFWorkbook(); // Use XSSF for xlsx format, HSSF for xls format
-        Sheet sheet = workbook.createSheet("Combinations");
-
-        int rowCount = 0;
-
+        boolean isForm = !formData.isEmpty();
         if (!formData.isEmpty()) {
-            combinations = generateCombinations(formData, possibleValues.getJSONObject("form"));
-            int i = 0;
-            for (Map<String, String> combination : combinations) {
-                try {
-                    String curlCommand = generateCurlCommand(request, combination, true);
-                    CurlCommandParser curl = new CurlCommandParser();
-
-                    System.out.println("---------------");
-                    System.out.println("Requesting this : " + curlCommand);
-                    Map response = curl.executeCurlCommand(curlCommand);
-                    System.out.println("Response : " + response);
-                    System.out.println("---------------");
-
-                    // Add a row to your Excel sheet
-                    Row row = sheet.createRow(++rowCount);
-                    row.createCell(0).setCellValue("Combination_" + i);
-                    row.createCell(1).setCellValue(curlCommand);
-                    row.createCell(2).setCellValue(response.get("url").toString());
-                    row.createCell(3).setCellValue(response.get("method").toString());
-                    row.createCell(4).setCellValue(response.get("headers").toString());
-                    row.createCell(5).setCellValue(response.get("formData").toString());
-                    row.createCell(6).setCellValue(response.get("data").toString());
-                    row.createCell(7).setCellValue(response.get("statusCode").toString());
-                    row.createCell(8).setCellValue(response.get("response").toString());
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                i++;
-            }
+            results = generateAndTestCombinations(formData, possibleValues.getJSONObject("form"), request, true);
         } else if (!body.isEmpty()) {
-            combinations = generateCombinations(body, possibleValues.getJSONObject("data"));
-            int i = 0;
-            for (Map<String, String> combination : combinations) {
-                try {
-                    String curlCommand = generateCurlCommand(request, combination, false);
-                    System.out.println("Requesting this : " + curlCommand);
-                    System.out.println("---------------");
-                    CurlCommandParser curl = new CurlCommandParser();
-                    Map response = curl.executeCurlCommand(curlCommand);
-
-                    System.out.println("Response : " + response);
-
-                    // Add a row to your Excel sheet
-                    Row row = sheet.createRow(++rowCount);
-                    row.createCell(0).setCellValue("Combination_" + i);
-                    row.createCell(1).setCellValue(curlCommand);
-                    row.createCell(2).setCellValue(response.get("url").toString());
-                    row.createCell(3).setCellValue(response.get("method").toString());
-                    row.createCell(4).setCellValue(response.get("headers").toString());
-                    row.createCell(5).setCellValue(response.get("formData").toString());
-                    row.createCell(6).setCellValue(response.get("data").toString());
-                    row.createCell(7).setCellValue(response.get("statusCode").toString());
-                    row.createCell(8).setCellValue(response.get("response").toString());
-
-
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-                i++;
-            }
+            results = generateAndTestCombinations(body, possibleValues.getJSONObject("data"), request, false);
+        } else {
+            throw new IllegalArgumentException("No form or body data provided");
         }
 
-        try (FileOutputStream outputStream = new FileOutputStream("combinations.xlsx")) {
-            workbook.write(outputStream);
+        // Create a new Workbook and a Sheet
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Results");
+
+            // Create a CellStyle for the header
+            CellStyle headerStyle = workbook.createCellStyle();
+            Font font = workbook.createFont();
+            font.setBold(true);
+            headerStyle.setFont(font);
+
+            // Create the header row
+            Row headerRow = sheet.createRow(0);
+            String[] headers = {"Unique ID for the combination", "Curl Command", "Header", "Body", "Form", "Response", "Status Code"};
+            for (int i = 0; i < headers.length; i++) {
+                Cell headerCell = headerRow.createCell(i);
+                headerCell.setCellValue(headers[i]);
+                headerCell.setCellStyle(headerStyle);
+            }
+
+            // Populate the data rows
+            int rowIndex = 1;
+            for (Map combination : results) {
+                Row row = sheet.createRow(rowIndex++);
+                row.createCell(0).setCellValue("Combination_" + (rowIndex - 1)); // Unique ID for the combination
+
+                // Modify the row cells based on the actual combination data
+                System.out.println("Curl" + combination.get("Curl Command").toString());
+                row.createCell(1).setCellValue(combination.get("Curl Command").toString()); // Curl Command
+
+                // You can set the header, body, and form cells using the values from the request JSON
+                row.createCell(2).setCellValue(request.getJSONObject("header").toString()); // Header
+                row.createCell(3).setCellValue(body.toString()); // Body
+                row.createCell(4).setCellValue(formData.toString()); // Form
+
+                // Retrieve the response and status code from the finalResponse map and set them in the cells
+
+                row.createCell(5).setCellValue(combination.get("response").toString()); // Response
+                row.createCell(6).setCellValue(combination.get("statusCode").toString()); // Status Code
+
+
+                System.out.println("Combination " + (rowIndex - 1) + ": " + combination);
+            }
+            try (FileOutputStream fileOut = new FileOutputStream("output.xlsx")) {
+                workbook.write(fileOut);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+    }
+
+    private static List<Map<String, String>> generateAndTestCombinations(JSONObject data, JSONObject possibleValues, JSONObject request, boolean isForm) {
+        List<Map<String, String>> combinations = generateCombinations(data, possibleValues);
+
+        int i = 0;
+        for (Map<String, String> combination : combinations) {
+            try {
+                String curlCommand = generateCurlCommand(request, combination, isForm);
+                CurlCommandParser curl = new CurlCommandParser();
+                Map<String, String> response = curl.executeCurlCommand(curlCommand);
+
+                // Add the curl command and response to the combination so we can include it in the result
+                combination.put("Curl Command", curlCommand);
+                combination.putAll(response);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            i++;
+        }
+
+        return combinations;
     }
 
 
-    private static final OkHttpClient client = new OkHttpClient();
-
     public static String generateCurlCommand(JSONObject request, Map<String, String> dataCombination, boolean isForm) {
-
-
         StringBuilder curlCommand = new StringBuilder("curl -X ");
         curlCommand.append(request.getString("methodType"));
 
@@ -134,7 +132,7 @@ public class CombinationGenerator {
         // Append headers
         JSONObject headers = request.getJSONObject("header");
         for (String key : headers.keySet()) {
-            curlCommand.append(" -H '").append(key).append(": ").append(headers.getString(key)).append("'");
+            curlCommand.append(" -H '").append(key).append(" : ").append(headers.getString(key)).append("'");
         }
 
         // Append data
@@ -147,7 +145,6 @@ public class CombinationGenerator {
             JSONObject newBody = new JSONObject(dataCombination);
             curlCommand.append(newBody.toString()).append("'");
         }
-
         return curlCommand.toString();
     }
 
@@ -156,7 +153,6 @@ public class CombinationGenerator {
         generateCombinationsRecursive(new LinkedHashMap<>(), new ArrayList<>(formData.keySet()), formData, possibleValues, combinations);
         return combinations;
     }
-
 
     private static void generateCombinationsRecursive(Map<String, String> currentCombination, List<String> remainingKeys, JSONObject formData, JSONObject possibleValues, List<Map<String, String>> combinations) {
         if (remainingKeys.isEmpty()) {
@@ -175,5 +171,4 @@ public class CombinationGenerator {
             currentCombination.remove(key);
         }
     }
-
 }
