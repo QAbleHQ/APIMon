@@ -1,6 +1,7 @@
 package org.example.core;
 
 import okhttp3.*;
+import org.tinylog.Logger;
 
 import java.io.IOException;
 import java.util.*;
@@ -11,7 +12,7 @@ public class CurlCommandParser {
 
     public Map executeCurlCommand(String curlCommand) throws IOException {
 
-
+        Logger.info("Sending Request");
         String method = getMethods(curlCommand);
         String url = getURl(curlCommand);
         Map<String, String> Headers = getHeaders(curlCommand);
@@ -94,7 +95,7 @@ public class CurlCommandParser {
         finalResponse.put("response", responseString);
         finalResponse.put("statusCode", statusCode);
 
-
+        Logger.info("Got Response with status code : " + statusCode);
 
 
         return finalResponse;
@@ -143,7 +144,7 @@ public class CurlCommandParser {
         String data = "";
         if (parts.length > 1) {
             data = parts[1].trim().split("'")[1];
-            System.out.println(data);
+
         }
         return data;
     }

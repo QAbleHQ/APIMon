@@ -1,5 +1,7 @@
 package org.example.core;
 
+import org.tinylog.Logger;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,9 +29,9 @@ public class CurlTester {
         for (int i = 1; i < parts.length; i++) {
             String header = parts[i].trim().split("'")[1];
             headers.put(header.split(":")[0].trim(), header.split(":")[1].trim());
-            System.out.println(header);
+
         }
-        System.out.println("headers" +headers);
+        Logger.info("headers " +headers);
         return headers;
     }
 
@@ -39,7 +41,8 @@ public class CurlTester {
         String data = "";
         if (parts.length > 1) {
             data = parts[1].trim().split("'")[1];
-            System.out.println("data" +data);
+            Logger.info("data " +data);
+
         }
         return data;
     }
@@ -51,7 +54,7 @@ public class CurlTester {
         for (int i = 0; i < parts.length; i++) {
             if (parts[i].equals("-X")) {
                 method = parts[i + 1].trim();
-                System.out.println("method" +method);
+                Logger.info("method " +method);
             }
         }
         return method;
@@ -73,7 +76,8 @@ public class CurlTester {
 
         // Print the form data map
         for (Map.Entry<String,String> entry : formData.entrySet()) {
-            System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+            Logger.info("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+
         }
         return formData;
     }

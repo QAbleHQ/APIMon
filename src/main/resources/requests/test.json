@@ -20,10 +20,13 @@
   "possibleValue": {
     "data": {
       "email": [
-        "apicoordinator@mailinator.com" , "" , "aa"
+        "apicoordinator@mailinator.com",
+        "",
+        "aa"
       ],
       "password": [
-        "QA_12345", ""
+        "QA_12345",
+        ""
       ],
       "remember_me": [
         true,
@@ -31,7 +34,8 @@
       ]
     }
   },
-  "SchemaFiles" : [
-    "validResponse.json"
+  "SchemaFiles": [
+    "NevvonAdminCorrect.json",
+    "nevvonAdminInCorrect.json"
   ]
 }

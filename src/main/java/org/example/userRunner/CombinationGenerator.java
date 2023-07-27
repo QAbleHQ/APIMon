@@ -7,18 +7,25 @@ import org.example.core.JsonSchemaValidator;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.*;
+
+import org.tinylog.Logger;
+
 
 public class CombinationGenerator {
 
-    static String jsonString = readJsonFile("/Users/viralpatel/Downloads/APIMon/src/main/resources/requests/test.json");
+    static String fileName = "test";
+    static String jsonString = readJsonFile(new File("src/main/resources/requests/" + fileName + ".json").getAbsolutePath());
 
 
     public static void main(String[] args) {
+        Logger.info("Starting the Combination Generator");
         JSONObject jsonObject = new JSONObject(jsonString);
 
         JSONObject request = jsonObject.getJSONObject("request");
@@ -29,7 +36,7 @@ public class CombinationGenerator {
         JSONObject pathParameters = request.has("pathParameters") ? request.getJSONObject("pathParameters") : new JSONObject();
         JSONObject queryParameters = request.has("queryParameters") ? request.getJSONObject("queryParameters") : new JSONObject();
 
-        JSONArray schemaFileList  = jsonObject.getJSONArray("schemaFileList");
+        JSONArray schemaFileList = jsonObject.getJSONArray("SchemaFiles");
 
 
         List<Map<String, String>> combinations;
@@ -56,7 +63,7 @@ public class CombinationGenerator {
 
             // Create the header row
             Row headerRow = sheet.createRow(0);
-            String[] headers = {"Unique ID for the combination", "Curl Command", "Header", "Body", "Form", "Response", "Status Code"};
+            String[] headers = {"Unique ID for the combination", "Curl Command", "Header", "Body", "Form", "Response", "Status Code", "result", "messages"};
             for (int i = 0; i < headers.length; i++) {
                 Cell headerCell = headerRow.createCell(i);
                 headerCell.setCellValue(headers[i]);
@@ -66,11 +73,13 @@ public class CombinationGenerator {
             // Populate the data rows
             int rowIndex = 1;
             for (Map combination : results) {
+
                 Row row = sheet.createRow(rowIndex++);
                 row.createCell(0).setCellValue("Combination_" + (rowIndex - 1)); // Unique ID for the combination
 
                 // Modify the row cells based on the actual combination data
-                System.out.println("Curl" + combination.get("Curl Command").toString());
+
+                Logger.info("Curl : " + combination.get("Curl Command").toString());
                 row.createCell(1).setCellValue(combination.get("Curl Command").toString()); // Curl Command
 
                 // You can set the header, body, and form cells using the values from the request JSON
@@ -84,11 +93,27 @@ public class CombinationGenerator {
                 row.createCell(6).setCellValue(combination.get("statusCode").toString()); // Status Code
 
                 JsonSchemaValidator jsonSchemaValidator = new JsonSchemaValidator();
-                jsonSchemaValidator.validateSchema(, combination.get("response").toString());
-                System.out.println("Combination " + (rowIndex - 1) + ": " + combination);
+                JSONObject result = jsonSchemaValidator.validateSchema(schemaFileList, combination.get("response").toString());
+
+                row.createCell(7).setCellValue(result.get("result").toString());
+                row.createCell(8).setCellValue(result.get("message").toString());
+
+
+                Logger.info("Combination " + (rowIndex - 1) + ": " + combination);
             }
-            try (FileOutputStream fileOut = new FileOutputStream("output.xlsx")) {
+            Date date = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy_h:mm:ss");
+            String formattedDate = sdf.format(date);
+            File outputFile = new File("src/main/resources/TestResult/Test_" + fileName + "_" + formattedDate + ".xlsx");
+
+            if (!outputFile.exists()) {
+                outputFile.createNewFile();
+            }
+
+            try (FileOutputStream fileOut = new FileOutputStream(outputFile)) {
                 workbook.write(fileOut);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -106,9 +131,12 @@ public class CombinationGenerator {
         }
         return jsonStr;
     }
+
     private static List<Map<String, String>> generateAndTestCombinations(JSONObject data, JSONObject possibleValues, JSONObject request, boolean isForm) {
+
         List<Map<String, String>> combinations = generateCombinations(data, possibleValues);
 
+        Logger.info("Total number of combinations: " + combinations.size());
         int i = 0;
         for (Map<String, String> combination : combinations) {
             try {
@@ -132,6 +160,7 @@ public class CombinationGenerator {
 
 
     public static String generateCurlCommand(JSONObject request, Map<String, String> dataCombination, boolean isForm) {
+        Logger.info("Generating curl command for combination: " + dataCombination);
         StringBuilder curlCommand = new StringBuilder("curl -X ");
         curlCommand.append(request.getString("methodType"));
 
