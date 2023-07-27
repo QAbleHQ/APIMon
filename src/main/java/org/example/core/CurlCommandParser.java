@@ -1,4 +1,4 @@
-package org.example;
+package org.example.core;
 
 import okhttp3.*;
 
@@ -93,6 +93,9 @@ public class CurlCommandParser {
 
         finalResponse.put("response", responseString);
         finalResponse.put("statusCode", statusCode);
+
+
+
 
         return finalResponse;
     }

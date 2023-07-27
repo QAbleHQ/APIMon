@@ -1,7 +1,9 @@
-package org.example;
+package org.example.userRunner;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.example.core.CurlCommandParser;
+import org.example.core.JsonSchemaValidator;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -13,19 +15,10 @@ import java.util.*;
 
 public class CombinationGenerator {
 
-    public static String readJsonFile(String filePath) {
-        String jsonStr = "";
-        try {
-            byte[] jsonData = Files.readAllBytes(Paths.get(filePath));
-            jsonStr = new String(jsonData);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return jsonStr;
-    }
+    static String jsonString = readJsonFile("/Users/viralpatel/Downloads/APIMon/src/main/resources/requests/test.json");
+
 
     public static void main(String[] args) {
-        String jsonString = readJsonFile("/Users/viralpatel/Downloads/APIMon/src/main/resources/requests/test.json");
         JSONObject jsonObject = new JSONObject(jsonString);
 
         JSONObject request = jsonObject.getJSONObject("request");
@@ -35,6 +28,9 @@ public class CombinationGenerator {
         JSONObject body = request.has("data") ? request.getJSONObject("data") : new JSONObject();
         JSONObject pathParameters = request.has("pathParameters") ? request.getJSONObject("pathParameters") : new JSONObject();
         JSONObject queryParameters = request.has("queryParameters") ? request.getJSONObject("queryParameters") : new JSONObject();
+
+        JSONArray schemaFileList  = jsonObject.getJSONArray("schemaFileList");
+
 
         List<Map<String, String>> combinations;
         List<Map<String, String>> results;
@@ -87,7 +83,8 @@ public class CombinationGenerator {
                 row.createCell(5).setCellValue(combination.get("response").toString()); // Response
                 row.createCell(6).setCellValue(combination.get("statusCode").toString()); // Status Code
 
-
+                JsonSchemaValidator jsonSchemaValidator = new JsonSchemaValidator();
+                jsonSchemaValidator.validateSchema(, combination.get("response").toString());
                 System.out.println("Combination " + (rowIndex - 1) + ": " + combination);
             }
             try (FileOutputStream fileOut = new FileOutputStream("output.xlsx")) {
@@ -99,6 +96,16 @@ public class CombinationGenerator {
 
     }
 
+    public static String readJsonFile(String filePath) {
+        String jsonStr = "";
+        try {
+            byte[] jsonData = Files.readAllBytes(Paths.get(filePath));
+            jsonStr = new String(jsonData);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return jsonStr;
+    }
     private static List<Map<String, String>> generateAndTestCombinations(JSONObject data, JSONObject possibleValues, JSONObject request, boolean isForm) {
         List<Map<String, String>> combinations = generateCombinations(data, possibleValues);
 
@@ -112,6 +119,7 @@ public class CombinationGenerator {
                 // Add the curl command and response to the combination so we can include it in the result
                 combination.put("Curl Command", curlCommand);
                 combination.putAll(response);
+
 
             } catch (Exception e) {
                 e.printStackTrace();

@@ -1,12 +1,13 @@
-package org.example;
+package org.example.core;
 
 
 import com.github.erosb.jsonsKema.*;
+import org.json.JSONArray;
 
 public class JsonSchemaValidator {
 
 
-    public void validateSchema(){
+    public void validateSchema(JSONArray schemaFileList){
 
 
 
