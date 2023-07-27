@@ -1,0 +1,5 @@
+{
+  "type": "object",
+  "properties": {"Ramesh": {"type": "string"}},
+  "required": ["Ramesh"]
+}

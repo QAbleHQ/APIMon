@@ -1,0 +1,63 @@
+{
+  "type": "object",
+  "properties": {
+    "access_token": {"type": "string"},
+    "expires_at": {"type": "string"},
+    "auth": {"type": "boolean"},
+    "organization": {
+      "type": "object",
+      "properties": {
+        "image": {"type": "null"},
+        "partner_id": {"type": "null"},
+        "location_mandatory": {"type": "integer"},
+        "discipline_mandatory": {"type": "integer"},
+        "hide_purchased_hours": {"type": "integer"},
+        "name": {"type": "string"},
+        "id": {"type": "integer"},
+        "display_name": {"type": "null"}
+      }
+    },
+    "message": {"type": "string"},
+    "user": {
+      "type": "object",
+      "properties": {
+        "meta_actions": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "image": {"type": "null"},
+        "organization_roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {"type": "string"},
+              "id": {"type": "integer"},
+              "display_name": {"type": "string"}
+            }
+          }
+        },
+        "organization_display_name": {"type": "null"},
+        "download_token": {"type": "string"},
+        "is_admin": {"type": "boolean"},
+        "country_code": {"type": "string"},
+        "view": {"type": "string"},
+        "default_landing_page": {
+          "type": "object",
+          "properties": {
+            "name": {"type": "string"},
+            "description": {"type": "string"},
+            "id": {"type": "integer"},
+            "key": {"type": "string"},
+            "order": {"type": "integer"}
+          }
+        },
+        "organization": {"type": "string"},
+        "name": {"type": "string"},
+        "id": {"type": "integer"},
+        "img64": {"type": "null"},
+        "email": {"type": "string"}
+      }
+    }
+  }
+}
